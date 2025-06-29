@@ -27,7 +27,13 @@ class AccountService(
 
     @Transactional
     fun login(request: LoginRequest): Account {
-        return accountRepository.findByNickname(request.nickname)
+        val account = accountRepository.findByNickname(request.nickname)
             .orElseThrow { ApiException(ErrorReason.LOGIN_FAILED, "존재하지 않는 계정입니다.") }
+
+        if (!account.isCorrectPassword(request.password)) {
+            throw ApiException(ErrorReason.LOGIN_FAILED, "비밀번호가 일치하지 않습니다.")
+        }
+
+        return account
     }
 }
