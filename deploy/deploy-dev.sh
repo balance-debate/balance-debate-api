@@ -18,7 +18,7 @@ git pull
 
 echo "app build"
 
-../gradlew clean build
+./gradlew clean build
 
 echo "copy executable jar file"
 

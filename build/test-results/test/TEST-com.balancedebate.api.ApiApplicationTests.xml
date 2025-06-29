@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.balancedebate.api.ApiApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-06-15T12:56:22.116Z" hostname="macui-MacBookPro.local" time="0.513">
+<testsuite name="com.balancedebate.api.ApiApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-06-15T13:01:48.007Z" hostname="macui-MacBookPro.local" time="0.638">
   <properties/>
-  <testcase name="contextLoads()" classname="com.balancedebate.api.ApiApplicationTests" time="0.513"/>
-  <system-out><![CDATA[21:56:21.001 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.balancedebate.api.ApiApplicationTests]: ApiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-21:56:21.081 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.balancedebate.api.ApiApplication for test class com.balancedebate.api.ApiApplicationTests
+  <testcase name="contextLoads()" classname="com.balancedebate.api.ApiApplicationTests" time="0.638"/>
+  <system-out><![CDATA[22:01:46.782 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.balancedebate.api.ApiApplicationTests]: ApiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+22:01:46.863 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.balancedebate.api.ApiApplication for test class com.balancedebate.api.ApiApplicationTests
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -14,9 +14,9 @@
 
  :: Spring Boot ::                (v3.5.0)
 
-2025-06-15T21:56:21.405+09:00  INFO 10659 --- [api] [    Test worker] c.balancedebate.api.ApiApplicationTests  : Starting ApiApplicationTests using Java 17.0.12 with PID 10659 (started by mac in /Users/mac/Desktop/develop/balance-debate-api)
-2025-06-15T21:56:21.407+09:00  INFO 10659 --- [api] [    Test worker] c.balancedebate.api.ApiApplicationTests  : No active profile set, falling back to 1 default profile: "default"
-2025-06-15T21:56:22.106+09:00  INFO 10659 --- [api] [    Test worker] c.balancedebate.api.ApiApplicationTests  : Started ApiApplicationTests in 0.916 seconds (process running for 1.759)
+2025-06-15T22:01:47.213+09:00  INFO 11163 --- [api] [    Test worker] c.balancedebate.api.ApiApplicationTests  : Starting ApiApplicationTests using Java 17.0.12 with PID 11163 (started by mac in /Users/mac/Desktop/develop/balance-debate-api)
+2025-06-15T22:01:47.215+09:00  INFO 11163 --- [api] [    Test worker] c.balancedebate.api.ApiApplicationTests  : No active profile set, falling back to 1 default profile: "default"
+2025-06-15T22:01:47.997+09:00  INFO 11163 --- [api] [    Test worker] c.balancedebate.api.ApiApplicationTests  : Started ApiApplicationTests in 1.004 seconds (process running for 2.002)
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
