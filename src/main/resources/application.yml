@@ -5,6 +5,9 @@ spring:
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  session:
+    store-type: jdbc
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,3 +17,8 @@ spring:
         format_sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
     open-in-view: false
+
+server:
+  servlet:
+    session:
+      timeout: 180d
