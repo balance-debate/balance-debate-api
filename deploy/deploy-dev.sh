@@ -22,7 +22,7 @@ echo "app build"
 
 echo "copy executable jar file"
 
-cp $REPOSITORY_DIR/$APP_NAME/build/libs/*.jar $REPOSITORY_DIR
+cp $REPOSITORY_DIR/$APP_NAME/build/libs/*SNAPSHOT.jar $REPOSITORY_DIR
 
 echo "check current pid"
 
