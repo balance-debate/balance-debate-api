@@ -5,13 +5,13 @@ import org.springframework.data.domain.Slice
 
 data class DebateSliceResponse(
     val hasNext: Boolean,
-    val debates: List<DebateListGetResponse>,
+    val debates: List<DebateGetResponse>,
 ) {
     companion object {
         fun from(debates: Slice<Debate>): DebateSliceResponse {
             return DebateSliceResponse(
                 hasNext = debates.hasNext(),
-                debates = DebateListGetResponse.from(debates.content)
+                debates = DebateGetResponse.from(debates.content)
             )
         }
     }
