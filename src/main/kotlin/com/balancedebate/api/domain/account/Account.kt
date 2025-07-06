@@ -13,20 +13,23 @@ class Account private constructor(
 
     @Column(nullable = false)
     private val password: String,
+
+    @Column(nullable = false)
+    val profileEmoji: String,
 ) : BaseEntity(), Serializable {
 
-    protected constructor() : this("", "")
+    protected constructor() : this("", "", "")
 
     fun isCorrectPassword(password: String): Boolean {
         return this.password == PasswordCryptoUtil.encrypt(password)
     }
     companion object {
-        fun of(nickname: String, password: String): Account {
+        fun of(nickname: String, password: String, profileEmoji: String): Account {
             if (nickname.isEmpty()) {
                 throw ApiException(errorReason = ErrorReason.BAD_REQUEST, message = "닉네임은 1글자 이상이어야 합니다.", code = "NOT_ALLOWED_EMPTY_NICKNAME")
             }
 
-            return Account(nickname, PasswordCryptoUtil.encrypt(password))
+            return Account(nickname, PasswordCryptoUtil.encrypt(password), profileEmoji)
         }
     }
 }

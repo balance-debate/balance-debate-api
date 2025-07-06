@@ -41,6 +41,6 @@ class AccountController(
 
     @GetMapping("/me")
     fun me(@LoginAccount account: Account): ApiResponse<AccountResponse> {
-        return ApiResponse.success(AccountResponse(account.nickname))
+        return ApiResponse.success(AccountResponse(account.nickname, account.profileEmoji))
     }
 }

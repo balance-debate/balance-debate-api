@@ -14,6 +14,13 @@ class AccountService(
     private val accountRepository: AccountRepository
 ) {
 
+    companion object {
+        private val EMOJIS = listOf(
+            "😀", "🤗", "😍", "🤩", "🥸", "😎", "🤠", "😇", "🥳", "🤓",
+            "🐶", "🐱", "🐵", "🐹", "🐰", "🦊", "🐻", "🐯", "🦁", "🐷"
+        )
+    }
+
     @Transactional
     fun signUp(request: SignupRequest) {
         val foundAccount = accountRepository.findByNickname(request.nickname)
@@ -21,7 +28,7 @@ class AccountService(
             throw ApiException(ErrorReason.SIGNUP_FAILED, "이미 존재하는 계정입니다.", "ALREADY_SIGNED_UP_ACCOUNT")
         }
 
-        val account = Account.of(request.nickname, request.password)
+        val account = Account.of(request.nickname, request.password, EMOJIS.random())
         accountRepository.save(account)
     }
 
