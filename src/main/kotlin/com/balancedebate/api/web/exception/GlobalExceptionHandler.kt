@@ -12,7 +12,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(value = [ApiException::class])
     fun handleApiException(exception: ApiException): ResponseEntity<ApiResponse<Unit>> {
         return ResponseEntity(
-            ApiResponse.failure(exception.errorReason.status, exception.message),
+            ApiResponse.failure(exception.errorReason.status, exception.message, exception.code),
             HttpStatus.valueOf(exception.errorReason.status)
         )
     }

@@ -1,9 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.balancedebate.api.ApiApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-06-29T10:20:54.611Z" hostname="macui-MacBookPro.local" time="0.58">
+<testsuite name="com.balancedebate.api.ApiApplicationTests" tests="1" skipped="0" failures="0" errors="0" timestamp="2025-06-29T13:28:51.551Z" hostname="macui-MacBookPro.local" time="0.342">
   <properties/>
-  <testcase name="contextLoads()" classname="com.balancedebate.api.ApiApplicationTests" time="0.58"/>
-  <system-out><![CDATA[19:20:53.352 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.balancedebate.api.ApiApplicationTests]: ApiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-19:20:53.447 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.balancedebate.api.ApiApplication for test class com.balancedebate.api.ApiApplicationTests
+  <testcase name="contextLoads()" classname="com.balancedebate.api.ApiApplicationTests" time="0.342"/>
+  <system-out><![CDATA[22:28:47,461 |-INFO in ch.qos.logback.classic.LoggerContext[default] - This is logback-classic version 1.5.18
+22:28:47,462 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae - Here is a list of configurators discovered as a service, by rank: 
+22:28:47,462 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae -   org.springframework.boot.logging.logback.RootLogLevelConfigurator
+22:28:47,462 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae - They will be invoked in order until ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY is returned.
+22:28:47,462 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae - Constructed configurator of type class org.springframework.boot.logging.logback.RootLogLevelConfigurator
+22:28:47,470 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae - org.springframework.boot.logging.logback.RootLogLevelConfigurator.configure() call lasted 0 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+22:28:47,470 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae - Trying to configure with ch.qos.logback.classic.joran.SerializedModelConfigurator
+22:28:47,470 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae - Constructed configurator of type class ch.qos.logback.classic.joran.SerializedModelConfigurator
+22:28:47,472 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.scmo]
+22:28:47,472 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback.scmo]
+22:28:47,472 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae - ch.qos.logback.classic.joran.SerializedModelConfigurator.configure() call lasted 2 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+22:28:47,472 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae - Trying to configure with ch.qos.logback.classic.util.DefaultJoranConfigurator
+22:28:47,473 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae - Constructed configurator of type class ch.qos.logback.classic.util.DefaultJoranConfigurator
+22:28:47,473 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Could NOT find resource [logback-test.xml]
+22:28:47,475 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found resource [logback.xml] at [file:/Users/mac/Desktop/develop/balance-debate-api/build/resources/main/logback.xml]
+22:28:47,553 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [CONSOLE]
+22:28:47,553 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
+22:28:47,586 |-WARN in ch.qos.logback.core.ConsoleAppender[CONSOLE] - This appender no longer admits a layout as a sub-component, set an encoder instead.
+22:28:47,586 |-WARN in ch.qos.logback.core.ConsoleAppender[CONSOLE] - To ensure compatibility, wrapping your layout in LayoutWrappingEncoder.
+22:28:47,586 |-WARN in ch.qos.logback.core.ConsoleAppender[CONSOLE] - See also https://logback.qos.ch/codes.html#layoutInsteadOfEncoder for details
+22:28:47,586 |-INFO in ch.qos.logback.core.ConsoleAppender[CONSOLE] - BEWARE: Writing to the console can be very slow. Avoid logging to the 
+22:28:47,586 |-INFO in ch.qos.logback.core.ConsoleAppender[CONSOLE] - console in production environments, especially in high volume systems.
+22:28:47,586 |-INFO in ch.qos.logback.core.ConsoleAppender[CONSOLE] - See also https://logback.qos.ch/codes.html#slowConsole
+22:28:47,587 |-INFO in ch.qos.logback.classic.model.processor.RootLoggerModelHandler - Setting level of ROOT logger to INFO
+22:28:47,587 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [CONSOLE] to Logger[ROOT]
+22:28:47,587 |-INFO in ch.qos.logback.core.model.processor.DefaultProcessor@60641ec8 - End of configuration.
+22:28:47,588 |-INFO in ch.qos.logback.classic.joran.JoranConfigurator@75f65e45 - Registering current configuration as safe fallback point
+22:28:47,588 |-INFO in ch.qos.logback.classic.util.ContextInitializer@3382f8ae - ch.qos.logback.classic.util.DefaultJoranConfigurator.configure() call lasted 116 milliseconds. ExecutionStatus=DO_NOT_INVOKE_NEXT_IF_ANY
+
+[INFO ] 2025-06-29 22:28:47.670 : o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.balancedebate.api.ApiApplicationTests]: ApiApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+[INFO ] 2025-06-29 22:28:47.780 : o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.balancedebate.api.ApiApplication for test class com.balancedebate.api.ApiApplicationTests
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -14,9 +43,38 @@
 
  :: Spring Boot ::                (v3.5.0)
 
-2025-06-29T19:20:53.804+09:00  INFO 7293 --- [api] [    Test worker] c.balancedebate.api.ApiApplicationTests  : Starting ApiApplicationTests using Java 17.0.12 with PID 7293 (started by mac in /Users/mac/Desktop/develop/balance-debate-api)
-2025-06-29T19:20:53.805+09:00  INFO 7293 --- [api] [    Test worker] c.balancedebate.api.ApiApplicationTests  : No active profile set, falling back to 1 default profile: "default"
-2025-06-29T19:20:54.599+09:00  INFO 7293 --- [api] [    Test worker] c.balancedebate.api.ApiApplicationTests  : Started ApiApplicationTests in 1.019 seconds (process running for 2.063)
+[INFO ] 2025-06-29 22:28:48.166 :      c.b.a.ApiApplicationTests - Starting ApiApplicationTests using Java 17.0.12 with PID 11424 (started by mac in /Users/mac/Desktop/develop/balance-debate-api)
+[INFO ] 2025-06-29 22:28:48.167 :      c.b.a.ApiApplicationTests - No active profile set, falling back to 1 default profile: "default"
+[INFO ] 2025-06-29 22:28:48.724 : o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+[INFO ] 2025-06-29 22:28:48.725 : o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+[INFO ] 2025-06-29 22:28:48.755 : o.s.d.r.c.RepositoryConfigurationExtensionSupport - Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.balancedebate.api.domain.account.AccountRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+[INFO ] 2025-06-29 22:28:48.755 : o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 25 ms. Found 0 JDBC repository interfaces.
+[INFO ] 2025-06-29 22:28:48.764 : o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+[INFO ] 2025-06-29 22:28:48.765 : o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+[INFO ] 2025-06-29 22:28:48.787 : o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 18 ms. Found 1 JPA repository interface.
+[INFO ] 2025-06-29 22:28:49.074 :         c.z.h.HikariDataSource - HikariPool-1 - Starting...
+[INFO ] 2025-06-29 22:28:49.414 :             c.z.h.p.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@6003220a
+[INFO ] 2025-06-29 22:28:49.415 :         c.z.h.HikariDataSource - HikariPool-1 - Start completed.
+[INFO ] 2025-06-29 22:28:49.478 :            o.h.j.i.u.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+[INFO ] 2025-06-29 22:28:49.520 :                    o.h.Version - HHH000412: Hibernate ORM core version 6.6.15.Final
+[INFO ] 2025-06-29 22:28:49.550 : o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+[INFO ] 2025-06-29 22:28:49.825 : o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+[WARN ] 2025-06-29 22:28:49.895 :              o.h.o.deprecation - HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+[WARN ] 2025-06-29 22:28:49.896 :              o.h.o.deprecation - HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+[INFO ] 2025-06-29 22:28:49.910 :                o.h.o.c.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+[INFO ] 2025-06-29 22:28:50.489 : o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+[INFO ] 2025-06-29 22:28:50.557 : o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+[INFO ] 2025-06-29 22:28:51.540 :      c.b.a.ApiApplicationTests - Started ApiApplicationTests in 3.622 seconds (process running for 4.798)
 ]]></system-out>
-  <system-err><![CDATA[]]></system-err>
+  <system-err><![CDATA[22:28:48,105 |-WARN in ch.qos.logback.core.ConsoleAppender[CONSOLE] - This appender no longer admits a layout as a sub-component, set an encoder instead.
+22:28:48,105 |-WARN in ch.qos.logback.core.ConsoleAppender[CONSOLE] - To ensure compatibility, wrapping your layout in LayoutWrappingEncoder.
+22:28:48,105 |-WARN in ch.qos.logback.core.ConsoleAppender[CONSOLE] - See also https://logback.qos.ch/codes.html#layoutInsteadOfEncoder for details
+]]></system-err>
 </testsuite>
