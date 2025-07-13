@@ -1,6 +1,6 @@
 package com.balancedebate.api.web.dto.debate
 
-import com.balancedebate.api.domain.account.Debate
+import com.balancedebate.api.domain.debate.Debate
 
 data class DebateGetResponse(
     val topic: String,

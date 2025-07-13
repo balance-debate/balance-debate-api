@@ -1,6 +1,6 @@
 package com.balancedebate.api.web.dto.debate
 
-import com.balancedebate.api.domain.account.Debate
+import com.balancedebate.api.domain.debate.Debate
 import org.springframework.data.domain.Slice
 
 data class DebateSliceResponse(

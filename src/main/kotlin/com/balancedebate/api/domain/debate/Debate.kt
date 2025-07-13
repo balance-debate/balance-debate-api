@@ -1,10 +1,7 @@
-package com.balancedebate.api.domain.account
+package com.balancedebate.api.domain.debate
 
 import com.balancedebate.api.domain.BaseEntity
-import com.balancedebate.api.web.exception.ApiException
-import com.balancedebate.api.web.exception.ErrorReason
 import jakarta.persistence.*
-import java.io.Serializable
 
 @Entity
 class Debate(
@@ -16,7 +13,14 @@ class Debate(
 
     @Column(nullable = false, name = "choice_b")
     val choiceB: String,
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "debate", cascade = [CascadeType.PERSIST])
+    val votes: MutableSet<Vote> = mutableSetOf()
 ) : BaseEntity() {
 
-    protected constructor() : this("", "", "")
+    fun add(vote: Vote) {
+        this.votes.add(vote)
+    }
+
+    constructor() : this("", "", "")
 }
