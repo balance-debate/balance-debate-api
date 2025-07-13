@@ -9,7 +9,10 @@ class Vote(
     val debate: Debate,
 
     val accountId: String,
+
+    @Enumerated(EnumType.STRING)
+    val target: VoteTarget,
 ) : BaseEntity() {
 
-    protected constructor() : this(Debate(), "")
+    protected constructor() : this(Debate(), "", VoteTarget.CHOICE_A)
 }

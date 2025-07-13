@@ -2,6 +2,8 @@ package com.balancedebate.api.web.controller
 
 import com.balancedebate.api.service.DebateService
 import com.balancedebate.api.web.dto.ApiResponse
+import com.balancedebate.api.web.dto.account.VoteRequest
+import com.balancedebate.api.web.dto.account.VoteResultResponse
 import com.balancedebate.api.web.dto.debate.DebateGetResponse
 import com.balancedebate.api.web.dto.debate.DebateSliceResponse
 import org.springframework.data.domain.PageRequest
@@ -23,8 +25,13 @@ class DebateController(
     }
 
     @PostMapping("/debates/{debateId}/votes")
-    fun vote(@PathVariable debateId: Long): ApiResponse<Unit> {
-        debateService.vote(debateId)
+    fun voteOnDebate(@PathVariable debateId: Long, @RequestBody request: VoteRequest): ApiResponse<Unit> {
+        debateService.voteOnDebate(debateId, request)
         return ApiResponse.success()
+    }
+
+    @GetMapping("/debates/{debateId}/votes")
+    fun getVoteResult(@PathVariable debateId: Long): ApiResponse<VoteResultResponse> {
+        return ApiResponse.success(debateService.getVoteResult(debateId))
     }
 }
