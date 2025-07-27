@@ -20,5 +20,6 @@ enum class ErrorReason(
     UNAUTHORIZED(401),
     FORBIDDEN(403),
     NOT_FOUND_ENTITY(404),
+    CONFLICT(409),
     UNKNOWN(500),
 }
