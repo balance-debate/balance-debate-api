@@ -1,6 +1,5 @@
 package com.balancedebate.api.service
 
-import com.balancedebate.api.domain.account.AccountRepository
 import com.balancedebate.api.domain.debate.DebateRepository
 import com.balancedebate.api.domain.debate.Vote
 import com.balancedebate.api.domain.debate.VoteTarget
@@ -17,7 +16,6 @@ import java.util.UUID
 
 @Service
 class DebateService(
-    private val accountRepository: AccountRepository,
     private val debateRepository: DebateRepository,
 ) {
 
