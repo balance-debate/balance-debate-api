@@ -115,7 +115,6 @@ class DebateService(
         return voteTokenUuid
     }
 
-
     @Transactional(readOnly = true)
     fun hasVote(debateId: Long, httpServletRequest: HttpServletRequest): HasVoteResponse {
         val loginUser = httpSession.getAttribute(LoginAccountArgumentResolver.LOGIN_ATTRIBUTE_NAME)

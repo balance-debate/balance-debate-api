@@ -16,6 +16,7 @@ enum class ErrorReason(
 ) {
     SIGNUP_FAILED(200),
     LOGIN_FAILED(200),
+    UNAUTHENTICATED(200),
     BAD_REQUEST(400),
     UNAUTHORIZED(401),
     FORBIDDEN(403),

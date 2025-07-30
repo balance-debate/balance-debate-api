@@ -40,7 +40,8 @@ class AccountController(
     }
 
     @GetMapping("/me")
-    fun me(@LoginAccount account: Account): ApiResponse<AccountResponse> {
+    fun me(): ApiResponse<AccountResponse> {
+        val account = accountService.getMe()
         return ApiResponse.success(AccountResponse(account.nickname, account.profileEmoji))
     }
 }
