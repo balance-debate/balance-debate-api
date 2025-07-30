@@ -1,6 +1,7 @@
 package com.balancedebate.api.service
 
 import com.balancedebate.api.domain.account.Account
+import com.balancedebate.api.domain.account.AccountRepository
 import com.balancedebate.api.domain.debate.DebateRepository
 import com.balancedebate.api.domain.debate.Vote
 import com.balancedebate.api.domain.debate.VoteRepository
@@ -27,6 +28,7 @@ class DebateService(
     private val debateRepository: DebateRepository,
     private val voteRepository: VoteRepository,
     private val httpSession: HttpSession,
+    private val accountRepository: AccountRepository,
 ) {
 
     companion object {
@@ -72,22 +74,26 @@ class DebateService(
             }
         } else {
             val account = loginUser as Account
+            val accountUser = accountRepository.findByNickname(account.nickname).get()
 
             // 해당 계정으로 이미 투표한 경우
-            voteRepository.findByDebateIdAndAccountId(debateId = debateId, accountId = account.id!!)?.let {
+            voteRepository.findByDebateIdAndAccountId(debateId = debateId, accountId = accountUser.id!!)?.let {
                 throw ApiException(ErrorReason.CONFLICT, "Already voted for debate with id $debateId", "ALREADY_VOTED")
             }
 
             // 회원이고 쿠키에 vote-token 이 없을 경우
             if (voteTokenCookie.isNullOrEmpty()) {
                 val voteTokenUuid = createVoteTokenCookie(httpServletResponse)
-                debate.add(Vote(debate = debate, uuid = voteTokenUuid, accountId = account.id, target = request.target))
+                debate.add(Vote(debate = debate, uuid = voteTokenUuid, accountId = accountUser.id, target = request.target))
                 return
             }
 
             // 회원이고 쿠키에 vote-token 이 있을 경우
             if (voteTokenCookie.isNotEmpty()) {
-                debate.add(Vote(debate = debate, uuid = voteTokenCookie, accountId = account.id, target = request.target))
+                voteRepository.findByDebateIdAndUuid(debateId = debateId, uuid = voteTokenCookie)?.let {
+                    throw ApiException(ErrorReason.CONFLICT, "Already voted for debate with id $debateId", "ALREADY_VOTED")
+                }
+                debate.add(Vote(debate = debate, uuid = voteTokenCookie, accountId = accountUser.id, target = request.target))
                 return
             }
         }
@@ -114,15 +120,21 @@ class DebateService(
             return HasVoteResponse(false)
         } else {
             val account = loginUser as Account
-            val hasVote = voteRepository.findByDebateIdAndAccountId(debateId, account.id!!) != null
+            val accountUser = accountRepository.findByNickname(account.nickname).get()
+            val hasVote = voteRepository.findByDebateIdAndAccountId(debateId, accountUser.id!!) != null
             HasVoteResponse(hasVote)
         }
     }
 
     @Transactional(readOnly = true)
-    fun getVoteResult(debateId: Long): VoteResultResponse {
+    fun getVoteResult(debateId: Long, httpServletRequest: HttpServletRequest): VoteResultResponse {
         val debate = debateRepository.findById(debateId)
             .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
+
+        val hasVote = hasVote(debateId, httpServletRequest)
+        if (!hasVote.hasVote) {
+            throw ApiException(ErrorReason.FORBIDDEN, "You have not voted for this debate", "NOT_VOTED")
+        }
 
         val votes = debate.votes
         val choiceACount = votes.count { it.target == VoteTarget.CHOICE_A }

@@ -40,7 +40,7 @@ class DebateController(
     }
 
     @GetMapping("/debates/{debateId}/votes")
-    fun getVoteResult(@PathVariable debateId: Long): ApiResponse<VoteResultResponse> {
-        return ApiResponse.success(debateService.getVoteResult(debateId))
+    fun getVoteResult(@PathVariable debateId: Long, httpServletRequest: HttpServletRequest): ApiResponse<VoteResultResponse> {
+        return ApiResponse.success(debateService.getVoteResult(debateId, httpServletRequest))
     }
 }
