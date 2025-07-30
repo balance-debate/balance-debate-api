@@ -104,6 +104,8 @@ class DebateService(
         val cookie = Cookie(VOTE_TOKEN_COOKIE_NAME, voteTokenUuid)
         cookie.path = "/"
         cookie.maxAge = VOTE_TOKEN_COOKIE_MAX_AGE
+        cookie.secure = true
+        cookie.setAttribute("SameSite", "None")
         httpServletResponse.addCookie(cookie)
         return voteTokenUuid
     }
