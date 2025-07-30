@@ -8,11 +8,13 @@ class Vote(
     @ManyToOne(fetch = FetchType.LAZY)
     val debate: Debate,
 
-    val accountId: String,
+    val uuid: String?,
+
+    val accountId: Long?,
 
     @Enumerated(EnumType.STRING)
     val target: VoteTarget,
 ) : BaseEntity() {
 
-    protected constructor() : this(Debate(), "", VoteTarget.CHOICE_A)
+    protected constructor() : this(Debate(), null, null, VoteTarget.CHOICE_A)
 }

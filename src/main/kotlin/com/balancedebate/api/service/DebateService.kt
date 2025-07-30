@@ -1,5 +1,6 @@
 package com.balancedebate.api.service
 
+import com.balancedebate.api.domain.account.Account
 import com.balancedebate.api.domain.debate.DebateRepository
 import com.balancedebate.api.domain.debate.Vote
 import com.balancedebate.api.domain.debate.VoteRepository
@@ -28,6 +29,12 @@ class DebateService(
     private val httpSession: HttpSession,
 ) {
 
+    companion object {
+        private const val VOTE_TOKEN_COOKIE_NAME = "vote-token"
+
+        private const val VOTE_TOKEN_COOKIE_MAX_AGE = 60 * 60 * 24 * 180 // 180 days
+    }
+
     @Transactional(readOnly = true)
     fun getDebates(pageable: Pageable): DebateSliceResponse {
         return DebateSliceResponse.from(debateRepository.findAll(pageable))
@@ -39,84 +46,77 @@ class DebateService(
             .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $id not found", "NOT_FOUND_DEBATE") }
     }
 
-    // TODO: 리팩토링
     @Transactional
-    fun voteOnDebate(
-        debateId: Long,
-        request: VoteRequest,
-        httpServletRequest: HttpServletRequest,
-        httpServletResponse: HttpServletResponse
-    ) {
+    fun voteOnDebate(debateId: Long, request: VoteRequest, httpServletRequest: HttpServletRequest, httpServletResponse: HttpServletResponse) {
         val loginUser = httpSession.getAttribute(LoginAccountArgumentResolver.LOGIN_ATTRIBUTE_NAME)
-        val voteTokenCookie = httpServletRequest.cookies?.firstOrNull { it.name == "vote-token" }?.value
+        val voteTokenCookie = httpServletRequest.cookies?.firstOrNull { VOTE_TOKEN_COOKIE_NAME == it.name }?.value
+        val debate = debateRepository.findById(debateId)
+            .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
 
-        // 비회원이고 쿠키에 vote-token 이 없을 경우
-        if (loginUser == null && voteTokenCookie.isNullOrEmpty()) {
-            val voteTokenUuid = UUID.randomUUID().toString()
-            val cookie = Cookie("vote-token", voteTokenUuid)
-            cookie.path = "/"
-            cookie.maxAge = 60 * 60 * 24 * 180
-            httpServletResponse.addCookie(cookie)
+        if (loginUser == null) {
+            // 비회원이고 쿠키에 vote-token 이 없을 경우
+            if (voteTokenCookie.isNullOrEmpty()) {
+                val voteTokenUuid = createVoteTokenCookie(httpServletResponse)
+                debate.add(Vote(debate = debate, uuid = voteTokenUuid, accountId = null, target = request.target))
+                return
+            }
 
-            debateRepository.findById(debateId)
-                .ifPresentOrElse(
-                    { debate -> debate.add(Vote(debate = debate, accountId = voteTokenUuid, target = request.target)) },
-                    { throw ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
-                )
-            return
-        }
+            // 비회원이고 쿠키에 vote-token 이 있을 경우
+            if (voteTokenCookie.isNotEmpty()) {
+                voteRepository.findByDebateIdAndUuid(debateId = debateId, uuid = voteTokenCookie)?.let {
+                    throw ApiException(ErrorReason.CONFLICT, "Already voted for debate with id $debateId", "ALREADY_VOTED")
+                }
 
-        // 비회원이고 쿠키에 vote-token 이 있을 경우
-        if (loginUser == null && !voteTokenCookie.isNullOrEmpty()) {
-            voteRepository.findByDebateIdAndAccountId(
-                debateId = debateId,
-                accountId = voteTokenCookie
-            )?.let {
+                debate.add(Vote(debate = debate, uuid = voteTokenCookie, accountId = null, target = request.target))
+                return
+            }
+        } else {
+            val account = loginUser as Account
+
+            // 해당 계정으로 이미 투표한 경우
+            voteRepository.findByDebateIdAndAccountId(debateId = debateId, accountId = account.id!!)?.let {
                 throw ApiException(ErrorReason.CONFLICT, "Already voted for debate with id $debateId", "ALREADY_VOTED")
             }
 
-            debateRepository.findById(debateId)
-                .ifPresentOrElse(
-                    { debate -> debate.add(Vote(debate = debate, accountId = voteTokenCookie, target = request.target)) },
-                    { throw ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
-                )
-            return
+            // 회원이고 쿠키에 vote-token 이 없을 경우
+            if (voteTokenCookie.isNullOrEmpty()) {
+                val voteTokenUuid = createVoteTokenCookie(httpServletResponse)
+                debate.add(Vote(debate = debate, uuid = voteTokenUuid, accountId = account.id, target = request.target))
+                return
+            }
+
+            // 회원이고 쿠키에 vote-token 이 있을 경우
+            if (voteTokenCookie.isNotEmpty()) {
+                debate.add(Vote(debate = debate, uuid = voteTokenCookie, accountId = account.id, target = request.target))
+                return
+            }
         }
+    }
 
-        /**
-         * 회원일 경우)
-         * 쿠키에 vote_token=uuid 가 없으면 debate.add(Vote()) 실행
-         * 쿠키에 vote_token=uuid 가 있는데 해당 uuid 로 생성된 Vote 가 없으면, debate.add(Vote()) 실행
-         * 쿠키에 vote_token=uuid 가 있는데 해당 uuid 로 생성된 Vote 가 있으면, 중복 투표인 것임
-         */
-
-        /**
-         * + 따닥 방지 (낙관적 락)
-         * + 성능 개선
-         */
-        debateRepository.findById(debateId)
-            .ifPresentOrElse(
-                { debate -> debate.add(Vote(debate = debate, accountId = UUID.randomUUID().toString(), target = request.target)) },
-                { throw ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
-            )
+    private fun createVoteTokenCookie(httpServletResponse: HttpServletResponse): String {
+        val voteTokenUuid = UUID.randomUUID().toString()
+        val cookie = Cookie(VOTE_TOKEN_COOKIE_NAME, voteTokenUuid)
+        cookie.path = "/"
+        cookie.maxAge = VOTE_TOKEN_COOKIE_MAX_AGE
+        httpServletResponse.addCookie(cookie)
+        return voteTokenUuid
     }
 
     @Transactional(readOnly = true)
     fun hasVote(debateId: Long, httpServletRequest: HttpServletRequest): HasVoteResponse {
         val loginUser = httpSession.getAttribute(LoginAccountArgumentResolver.LOGIN_ATTRIBUTE_NAME)
-        val voteTokenCookie = httpServletRequest.cookies?.firstOrNull { it.name == "vote-token" }?.value
+        val voteTokenCookie = httpServletRequest.cookies?.firstOrNull { it.name == VOTE_TOKEN_COOKIE_NAME }?.value
 
-        if (loginUser == null && voteTokenCookie.isNullOrEmpty()) {
-            return HasVoteResponse(false)
+        return if (loginUser == null && voteTokenCookie.isNullOrEmpty()) {
+            HasVoteResponse(false)
+        } else if (loginUser == null && !voteTokenCookie.isNullOrEmpty()) {
+            val hasVote = voteRepository.findByDebateIdAndUuid(debateId, voteTokenCookie) != null
+            HasVoteResponse(hasVote)
+        } else {
+            val account = loginUser as Account
+            val hasVote = voteRepository.findByDebateIdAndAccountId(debateId, account.id!!) != null
+            HasVoteResponse(hasVote)
         }
-
-        if (loginUser == null && !voteTokenCookie.isNullOrEmpty()) {
-            val hasVote = voteRepository.findByDebateIdAndAccountId(debateId, voteTokenCookie) != null
-            return HasVoteResponse(hasVote)
-        }
-
-        // TODO: 회원일 경우 작업
-        return HasVoteResponse(false)
     }
 
     @Transactional(readOnly = true)
