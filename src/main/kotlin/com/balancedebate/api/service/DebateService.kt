@@ -14,6 +14,7 @@ import com.balancedebate.api.web.dto.debate.DebateGetResponse
 import com.balancedebate.api.web.dto.debate.DebateSliceResponse
 import com.balancedebate.api.web.exception.ApiException
 import com.balancedebate.api.web.exception.ErrorReason
+import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpSession
@@ -100,18 +101,13 @@ class DebateService(
 
     private fun createVoteTokenAndSetCookie(httpServletResponse: HttpServletResponse): String {
         val voteTokenUuid = UUID.randomUUID().toString()
-        val maxAge = VOTE_TOKEN_COOKIE_MAX_AGE
-
-        val cookieHeaderValue = buildString {
-            append("$VOTE_TOKEN_COOKIE_NAME=$voteTokenUuid")
-            append("; Path=/")
-            append("; Max-Age=$maxAge")
-            append("; HttpOnly")
-            append("; Secure")
-            append("; SameSite=None")
+        val cookie = Cookie(VOTE_TOKEN_COOKIE_NAME, voteTokenUuid).apply {
+            path = "/"
+            maxAge = VOTE_TOKEN_COOKIE_MAX_AGE
+            isHttpOnly = true
+            secure = true
         }
-
-        httpServletResponse.setHeader("Set-Cookie", cookieHeaderValue)
+        httpServletResponse.addCookie(cookie)
         return voteTokenUuid
     }
 
