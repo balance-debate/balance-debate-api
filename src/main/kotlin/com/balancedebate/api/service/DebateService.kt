@@ -100,12 +100,21 @@ class DebateService(
 
     private fun createVoteTokenAndSetCookie(httpServletResponse: HttpServletResponse): String {
         val voteTokenUuid = UUID.randomUUID().toString()
-        httpServletResponse.setHeader(
-            "Set-Cookie",
-            "$VOTE_TOKEN_COOKIE_NAME=$voteTokenUuid; Path=/; HttpOnly; Secure; SameSite=None"
-        )
+        val maxAge = VOTE_TOKEN_COOKIE_MAX_AGE
+
+        val cookieHeaderValue = buildString {
+            append("$VOTE_TOKEN_COOKIE_NAME=$voteTokenUuid")
+            append("; Path=/")
+            append("; Max-Age=$maxAge")
+            append("; HttpOnly")
+            append("; Secure")
+            append("; SameSite=None")
+        }
+
+        httpServletResponse.setHeader("Set-Cookie", cookieHeaderValue)
         return voteTokenUuid
     }
+
 
     @Transactional(readOnly = true)
     fun hasVote(debateId: Long, httpServletRequest: HttpServletRequest): HasVoteResponse {
