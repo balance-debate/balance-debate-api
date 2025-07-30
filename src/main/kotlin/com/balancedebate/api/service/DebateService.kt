@@ -107,11 +107,11 @@ class DebateService(
         val loginUser = httpSession.getAttribute(LoginAccountArgumentResolver.LOGIN_ATTRIBUTE_NAME)
         val voteTokenCookie = httpServletRequest.cookies?.firstOrNull { it.name == VOTE_TOKEN_COOKIE_NAME }?.value
 
-        return if (loginUser == null && voteTokenCookie.isNullOrEmpty()) {
-            HasVoteResponse(false)
-        } else if (loginUser == null && !voteTokenCookie.isNullOrEmpty()) {
+        return if (!voteTokenCookie.isNullOrEmpty()) {
             val hasVote = voteRepository.findByDebateIdAndUuid(debateId, voteTokenCookie) != null
             HasVoteResponse(hasVote)
+        } else if (loginUser == null && voteTokenCookie.isNullOrEmpty()) {
+            return HasVoteResponse(false)
         } else {
             val account = loginUser as Account
             val hasVote = voteRepository.findByDebateIdAndAccountId(debateId, account.id!!) != null
