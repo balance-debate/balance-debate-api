@@ -14,7 +14,6 @@ import com.balancedebate.api.web.dto.debate.DebateGetResponse
 import com.balancedebate.api.web.dto.debate.DebateSliceResponse
 import com.balancedebate.api.web.exception.ApiException
 import com.balancedebate.api.web.exception.ErrorReason
-import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpSession
@@ -58,7 +57,7 @@ class DebateService(
         if (loginUser == null) {
             // 비회원이고 쿠키에 vote-token 이 없을 경우
             if (voteTokenCookie.isNullOrEmpty()) {
-                val voteTokenUuid = createVoteTokenCookie(httpServletResponse)
+                val voteTokenUuid = createVoteTokenAndSetCookie(httpServletResponse)
                 debate.add(Vote(debate = debate, uuid = voteTokenUuid, accountId = null, target = request.target))
                 return
             }
@@ -83,7 +82,7 @@ class DebateService(
 
             // 회원이고 쿠키에 vote-token 이 없을 경우
             if (voteTokenCookie.isNullOrEmpty()) {
-                val voteTokenUuid = createVoteTokenCookie(httpServletResponse)
+                val voteTokenUuid = createVoteTokenAndSetCookie(httpServletResponse)
                 debate.add(Vote(debate = debate, uuid = voteTokenUuid, accountId = accountUser.id, target = request.target))
                 return
             }
@@ -99,14 +98,12 @@ class DebateService(
         }
     }
 
-    private fun createVoteTokenCookie(httpServletResponse: HttpServletResponse): String {
+    private fun createVoteTokenAndSetCookie(httpServletResponse: HttpServletResponse): String {
         val voteTokenUuid = UUID.randomUUID().toString()
-        val cookie = Cookie(VOTE_TOKEN_COOKIE_NAME, voteTokenUuid)
-        cookie.path = "/"
-        cookie.maxAge = VOTE_TOKEN_COOKIE_MAX_AGE
-        cookie.secure = true
-        cookie.setAttribute("SameSite", "None")
-        httpServletResponse.addCookie(cookie)
+        httpServletResponse.setHeader(
+            "Set-Cookie",
+            "$VOTE_TOKEN_COOKIE_NAME=$voteTokenUuid; Path=/; HttpOnly; Secure; SameSite=None"
+        )
         return voteTokenUuid
     }
 
