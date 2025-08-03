@@ -14,13 +14,16 @@ class Debate(
     @Column(nullable = false, name = "choice_b")
     val choiceB: String,
 
+    @Column(nullable = false, name = "thumbnail_url")
+    val thumbnailUrl: String,
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "debate", cascade = [CascadeType.PERSIST])
-    val votes: MutableSet<Vote> = mutableSetOf()
+    val votes: MutableSet<Vote> = mutableSetOf(),
 ) : BaseEntity() {
 
     fun add(vote: Vote) {
         this.votes.add(vote)
     }
 
-    constructor() : this("", "", "")
+    constructor() : this("", "", "", "")
 }

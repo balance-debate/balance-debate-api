@@ -2,16 +2,19 @@ package com.balancedebate.api.service
 
 import com.balancedebate.api.domain.account.Account
 import com.balancedebate.api.domain.account.AccountRepository
+import com.balancedebate.api.web.config.LoginAccountArgumentResolver
 import com.balancedebate.api.web.dto.account.LoginRequest
 import com.balancedebate.api.web.dto.account.SignupRequest
 import com.balancedebate.api.web.exception.ApiException
 import com.balancedebate.api.web.exception.ErrorReason
+import jakarta.servlet.http.HttpSession
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class AccountService(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val httpSession: HttpSession,
 ) {
 
     companion object {
@@ -42,5 +45,14 @@ class AccountService(
         }
 
         return account
+    }
+
+    fun getMe(): Account {
+        val loginUser = httpSession.getAttribute(LoginAccountArgumentResolver.LOGIN_ATTRIBUTE_NAME)
+        if (loginUser != null) {
+            return loginUser as Account
+        } else {
+            throw ApiException(ErrorReason.UNAUTHENTICATED, "비로그인 상태입니다.", "UNAUTHENTICATED")
+        }
     }
 }

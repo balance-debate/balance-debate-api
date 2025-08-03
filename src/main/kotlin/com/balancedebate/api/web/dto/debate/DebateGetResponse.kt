@@ -6,6 +6,7 @@ data class DebateGetResponse(
     val topic: String,
     val choiceA: String,
     val choiceB: String,
+    val thumbnailUrl: String,
 ) {
     companion object {
         fun from(debates: List<Debate>): List<DebateGetResponse> {
@@ -16,7 +17,8 @@ data class DebateGetResponse(
             return DebateGetResponse(
                 topic = debate.topic,
                 choiceA = debate.choiceA,
-                choiceB = debate.choiceB
+                choiceB = debate.choiceB,
+                thumbnailUrl = debate.thumbnailUrl,
             )
         }
     }
