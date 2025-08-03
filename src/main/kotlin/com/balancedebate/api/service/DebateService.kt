@@ -169,9 +169,11 @@ class DebateService(
     }
 
     @Transactional(readOnly = true)
-    fun getComments(debateId: Long, pageable: Pageable): CommentSliceResponse {
+    fun getComments(debateId: Long, httpServletRequest: HttpServletRequest, pageable: Pageable): CommentSliceResponse {
         val debate = debateRepository.findById(debateId)
             .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
+
+        validateHasVote(debateId, httpServletRequest)
 
         val sliceComments = commentRepository.findByDebate(debate, pageable)
         val comments = sliceComments.content

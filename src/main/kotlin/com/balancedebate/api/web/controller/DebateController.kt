@@ -50,7 +50,8 @@ class DebateController(
     }
 
     @GetMapping("/debates/{debateId}/comments")
-    fun getComments(@PathVariable debateId: Long, @RequestParam page: Int, @RequestParam size: Int): ApiResponse<CommentSliceResponse> {
-        return ApiResponse.success(debateService.getComments(debateId, PageRequest.of(page, size)))
+    fun getComments(@PathVariable debateId: Long, httpServletRequest: HttpServletRequest,
+                    @RequestParam page: Int, @RequestParam size: Int): ApiResponse<CommentSliceResponse> {
+        return ApiResponse.success(debateService.getComments(debateId, httpServletRequest, PageRequest.of(page, size)))
     }
 }
