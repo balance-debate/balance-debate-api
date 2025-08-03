@@ -163,6 +163,15 @@ class DebateService(
 
         validateHasVote(debateId, httpServletRequest)
 
-        debate.addComment(loginUser.id!!, request.content)
+        if (request.parentCommentId != null) {
+            val parentComment = debate.comments.find { it.id == request.parentCommentId }
+                ?: throw ApiException(ErrorReason.NOT_FOUND_ENTITY, "Parent comment with id ${request.parentCommentId} not found", "NOT_FOUND_COMMENT")
+
+            if (parentComment.debate.id != debateId) {
+                throw ApiException(ErrorReason.BAD_REQUEST, "Parent comment does not belong to the debate", "INVALID_PARENT_COMMENT")
+            }
+        }
+
+        debate.addComment(loginUser.id!!, request.content, request.parentCommentId)
     }
 }

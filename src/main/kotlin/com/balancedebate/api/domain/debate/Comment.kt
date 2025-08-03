@@ -17,6 +17,9 @@ class Comment(
     @Column(nullable = false)
     val content: String,
 
+    @Column
+    val parentCommentId: Long? = null,
+
 ) : BaseEntity() {
 
     companion object {

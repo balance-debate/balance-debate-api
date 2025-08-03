@@ -29,8 +29,8 @@ class Debate(
         this.votes.add(vote)
     }
 
-    fun addComment(accountId: Long, content: String) {
-        val comment = Comment(this, accountId, content)
+    fun addComment(accountId: Long, content: String, parentCommentId: Long? = null) {
+        val comment = Comment(this, accountId, content, parentCommentId)
         this.comments.add(comment)
     }
 
