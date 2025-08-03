@@ -1,4 +1,4 @@
-package com.balancedebate.api.web.dto.comment
+package com.balancedebate.api.web.dto.debate
 
 data class CommentCreateRequest (
     val parentCommentId: Long?,

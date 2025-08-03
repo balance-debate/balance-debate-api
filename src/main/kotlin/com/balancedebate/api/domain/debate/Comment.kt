@@ -4,6 +4,7 @@ import com.balancedebate.api.domain.BaseEntity
 import com.balancedebate.api.web.exception.ApiException
 import com.balancedebate.api.web.exception.ErrorReason
 import jakarta.persistence.*
+import kotlin.jvm.Transient
 
 @Entity
 class Comment(
@@ -21,6 +22,9 @@ class Comment(
     val parentCommentId: Long? = null,
 
 ) : BaseEntity() {
+
+    @Transient
+    lateinit var childComments: List<Comment>
 
     companion object {
         private const val MAX_CONTENT_LENGTH = 500

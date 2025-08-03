@@ -4,12 +4,7 @@ import com.balancedebate.api.domain.account.Account
 import com.balancedebate.api.service.DebateService
 import com.balancedebate.api.web.config.LoginAccount
 import com.balancedebate.api.web.dto.ApiResponse
-import com.balancedebate.api.web.dto.comment.CommentCreateRequest
-import com.balancedebate.api.web.dto.debate.HasVoteResponse
-import com.balancedebate.api.web.dto.debate.VoteRequest
-import com.balancedebate.api.web.dto.debate.VoteResultResponse
-import com.balancedebate.api.web.dto.debate.DebateGetResponse
-import com.balancedebate.api.web.dto.debate.DebateSliceResponse
+import com.balancedebate.api.web.dto.debate.*
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.data.domain.PageRequest
@@ -52,5 +47,10 @@ class DebateController(
                       httpServletRequest: HttpServletRequest): ApiResponse<Unit> {
         debateService.createComment(account, debateId, request, httpServletRequest)
         return ApiResponse.success()
+    }
+
+    @GetMapping("/debates/{debateId}/comments")
+    fun getComments(@PathVariable debateId: Long, @RequestParam page: Int, @RequestParam size: Int): ApiResponse<CommentSliceResponse> {
+        return ApiResponse.success(debateService.getComments(debateId, PageRequest.of(page, size)))
     }
 }

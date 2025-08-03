@@ -2,17 +2,9 @@ package com.balancedebate.api.service
 
 import com.balancedebate.api.domain.account.Account
 import com.balancedebate.api.domain.account.AccountRepository
-import com.balancedebate.api.domain.debate.DebateRepository
-import com.balancedebate.api.domain.debate.Vote
-import com.balancedebate.api.domain.debate.VoteRepository
-import com.balancedebate.api.domain.debate.VoteTarget
+import com.balancedebate.api.domain.debate.*
 import com.balancedebate.api.web.config.LoginAccountArgumentResolver
-import com.balancedebate.api.web.dto.comment.CommentCreateRequest
-import com.balancedebate.api.web.dto.debate.HasVoteResponse
-import com.balancedebate.api.web.dto.debate.VoteRequest
-import com.balancedebate.api.web.dto.debate.VoteResultResponse
-import com.balancedebate.api.web.dto.debate.DebateGetResponse
-import com.balancedebate.api.web.dto.debate.DebateSliceResponse
+import com.balancedebate.api.web.dto.debate.*
 import com.balancedebate.api.web.exception.ApiException
 import com.balancedebate.api.web.exception.ErrorReason
 import jakarta.servlet.http.HttpServletRequest
@@ -28,6 +20,7 @@ import java.util.*
 class DebateService(
     private val debateRepository: DebateRepository,
     private val voteRepository: VoteRepository,
+    private val commentRepository: CommentRepository,
     private val httpSession: HttpSession,
     private val accountRepository: AccountRepository,
 ) {
@@ -173,5 +166,21 @@ class DebateService(
         }
 
         debate.addComment(loginUser.id!!, request.content, request.parentCommentId)
+    }
+
+    @Transactional(readOnly = true)
+    fun getComments(debateId: Long, pageable: Pageable): CommentSliceResponse {
+        val debate = debateRepository.findById(debateId)
+            .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
+
+        val sliceComments = commentRepository.findByDebate(debate, pageable)
+        val comments = sliceComments.content
+        val parentCommentIds = comments.map { it.id!! }
+        val childComments = commentRepository.findByParentCommentIdIn(parentCommentIds)
+        comments.forEach { comment ->
+            comment.childComments = childComments.filter { it.parentCommentId == comment.id }
+        }
+
+        return CommentSliceResponse(hasNext = sliceComments.hasNext(), comments = CommentGetResponse.from(comments))
     }
 }
