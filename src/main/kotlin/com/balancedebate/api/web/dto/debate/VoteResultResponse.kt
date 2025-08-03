@@ -1,4 +1,4 @@
-package com.balancedebate.api.web.dto.account
+package com.balancedebate.api.web.dto.debate
 
 data class VoteResultResponse(
     val choiceACount: Int,

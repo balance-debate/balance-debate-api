@@ -1,12 +1,10 @@
 package com.balancedebate.api.web.controller
 
+import com.balancedebate.api.domain.account.Account
 import com.balancedebate.api.service.DebateService
+import com.balancedebate.api.web.config.LoginAccount
 import com.balancedebate.api.web.dto.ApiResponse
-import com.balancedebate.api.web.dto.account.HasVoteResponse
-import com.balancedebate.api.web.dto.account.VoteRequest
-import com.balancedebate.api.web.dto.account.VoteResultResponse
-import com.balancedebate.api.web.dto.debate.DebateGetResponse
-import com.balancedebate.api.web.dto.debate.DebateSliceResponse
+import com.balancedebate.api.web.dto.debate.*
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.data.domain.PageRequest
@@ -42,5 +40,18 @@ class DebateController(
     @GetMapping("/debates/{debateId}/votes")
     fun getVoteResult(@PathVariable debateId: Long, httpServletRequest: HttpServletRequest): ApiResponse<VoteResultResponse> {
         return ApiResponse.success(debateService.getVoteResult(debateId, httpServletRequest))
+    }
+
+    @PostMapping("/debates/{debateId}/comments")
+    fun createComment(@LoginAccount account: Account, @PathVariable debateId: Long, @RequestBody request: CommentCreateRequest,
+                      httpServletRequest: HttpServletRequest): ApiResponse<Unit> {
+        debateService.createComment(account, debateId, request, httpServletRequest)
+        return ApiResponse.success()
+    }
+
+    @GetMapping("/debates/{debateId}/comments")
+    fun getComments(@LoginAccount account: Account, @PathVariable debateId: Long, httpServletRequest: HttpServletRequest,
+                    @RequestParam page: Int, @RequestParam size: Int): ApiResponse<CommentSliceResponse> {
+        return ApiResponse.success(debateService.getComments(debateId, httpServletRequest, PageRequest.of(page, size)))
     }
 }

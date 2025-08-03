@@ -1,6 +1,7 @@
 package com.balancedebate.api.domain.debate
 
 import com.balancedebate.api.domain.BaseEntity
+import com.balancedebate.api.domain.account.Account
 import jakarta.persistence.*
 
 @Entity
@@ -19,10 +20,18 @@ class Debate(
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "debate", cascade = [CascadeType.PERSIST])
     val votes: MutableSet<Vote> = mutableSetOf(),
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "debate", cascade = [CascadeType.PERSIST])
+    val comments: MutableSet<Comment> = mutableSetOf(),
 ) : BaseEntity() {
 
     fun add(vote: Vote) {
         this.votes.add(vote)
+    }
+
+    fun addComment(accountId: Long, content: String, parentCommentId: Long? = null) {
+        val comment = Comment(this, accountId, content, parentCommentId)
+        this.comments.add(comment)
     }
 
     constructor() : this("", "", "", "")

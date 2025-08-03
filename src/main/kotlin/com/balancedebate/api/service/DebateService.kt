@@ -2,19 +2,11 @@ package com.balancedebate.api.service
 
 import com.balancedebate.api.domain.account.Account
 import com.balancedebate.api.domain.account.AccountRepository
-import com.balancedebate.api.domain.debate.DebateRepository
-import com.balancedebate.api.domain.debate.Vote
-import com.balancedebate.api.domain.debate.VoteRepository
-import com.balancedebate.api.domain.debate.VoteTarget
+import com.balancedebate.api.domain.debate.*
 import com.balancedebate.api.web.config.LoginAccountArgumentResolver
-import com.balancedebate.api.web.dto.account.HasVoteResponse
-import com.balancedebate.api.web.dto.account.VoteRequest
-import com.balancedebate.api.web.dto.account.VoteResultResponse
-import com.balancedebate.api.web.dto.debate.DebateGetResponse
-import com.balancedebate.api.web.dto.debate.DebateSliceResponse
+import com.balancedebate.api.web.dto.debate.*
 import com.balancedebate.api.web.exception.ApiException
 import com.balancedebate.api.web.exception.ErrorReason
-import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpSession
@@ -23,10 +15,12 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
+@Transactional
 @Service
 class DebateService(
     private val debateRepository: DebateRepository,
     private val voteRepository: VoteRepository,
+    private val commentRepository: CommentRepository,
     private val httpSession: HttpSession,
     private val accountRepository: AccountRepository,
 ) {
@@ -48,7 +42,6 @@ class DebateService(
             .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $id not found", "NOT_FOUND_DEBATE") }
     }
 
-    @Transactional
     fun voteOnDebate(debateId: Long, request: VoteRequest, httpServletRequest: HttpServletRequest, httpServletResponse: HttpServletResponse) {
         val loginUser = httpSession.getAttribute(LoginAccountArgumentResolver.LOGIN_ATTRIBUTE_NAME)
         val voteTokenCookie = httpServletRequest.cookies?.firstOrNull { VOTE_TOKEN_COOKIE_NAME == it.name }?.value
@@ -138,15 +131,58 @@ class DebateService(
         val debate = debateRepository.findById(debateId)
             .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
 
-        val hasVote = hasVote(debateId, httpServletRequest)
-        if (!hasVote.hasVote) {
-            throw ApiException(ErrorReason.FORBIDDEN, "You have not voted for this debate", "NOT_VOTED")
-        }
+        validateHasVote(debateId, httpServletRequest)
 
         val votes = debate.votes
         val choiceACount = votes.count { it.target == VoteTarget.CHOICE_A }
         val choiceBCount = votes.count { it.target == VoteTarget.CHOICE_B }
 
         return VoteResultResponse(choiceACount, choiceBCount)
+    }
+
+    private fun validateHasVote(debateId: Long, httpServletRequest: HttpServletRequest) {
+        val hasVote = hasVote(debateId, httpServletRequest)
+        if (!hasVote.hasVote) {
+            throw ApiException(ErrorReason.FORBIDDEN, "You have not voted for this debate", "NOT_VOTED")
+        }
+    }
+
+    fun createComment(account: Account, debateId: Long, request: CommentCreateRequest, httpServletRequest: HttpServletRequest) {
+        val debate = debateRepository.findById(debateId)
+            .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
+
+        val loginUser = accountRepository.findByNickname(account.nickname)
+            .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Account with nickname ${account.nickname} not found", "NOT_FOUND_ACCOUNT") }
+
+        validateHasVote(debateId, httpServletRequest)
+
+        if (request.parentCommentId != null) {
+            val parentComment = debate.comments.find { it.id == request.parentCommentId }
+                ?: throw ApiException(ErrorReason.BAD_REQUEST, "Parent comment with id ${request.parentCommentId} not found", "NOT_FOUND_COMMENT")
+
+            if (parentComment.debate.id != debateId) {
+                throw ApiException(ErrorReason.BAD_REQUEST, "Parent comment does not belong to the debate", "INVALID_PARENT_COMMENT")
+            }
+        }
+
+        debate.addComment(loginUser.id!!, request.content, request.parentCommentId)
+    }
+
+    @Transactional(readOnly = true)
+    fun getComments(debateId: Long, httpServletRequest: HttpServletRequest, pageable: Pageable): CommentSliceResponse {
+        val debate = debateRepository.findById(debateId)
+            .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
+
+        validateHasVote(debateId, httpServletRequest)
+
+        val sliceComments = commentRepository.findByDebate(debate, pageable)
+        val comments = sliceComments.content
+        val parentCommentIds = comments.map { it.id!! }
+        val childComments = commentRepository.findByParentCommentIdIn(parentCommentIds)
+        comments.forEach { comment ->
+            comment.childComments = childComments.filter { it.parentCommentId == comment.id }
+        }
+
+        return CommentSliceResponse(hasNext = sliceComments.hasNext(), comments = CommentGetResponse.from(comments))
     }
 }
