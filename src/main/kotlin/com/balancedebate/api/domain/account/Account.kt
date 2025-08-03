@@ -18,7 +18,7 @@ class Account private constructor(
     val profileEmoji: String,
 ) : BaseEntity(), Serializable {
 
-    protected constructor() : this("", "", "")
+    constructor() : this("", "", "")
 
     fun isCorrectPassword(password: String): Boolean {
         return this.password == PasswordCryptoUtil.encrypt(password)

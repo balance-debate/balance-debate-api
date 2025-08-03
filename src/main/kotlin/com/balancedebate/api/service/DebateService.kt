@@ -7,14 +7,14 @@ import com.balancedebate.api.domain.debate.Vote
 import com.balancedebate.api.domain.debate.VoteRepository
 import com.balancedebate.api.domain.debate.VoteTarget
 import com.balancedebate.api.web.config.LoginAccountArgumentResolver
-import com.balancedebate.api.web.dto.account.HasVoteResponse
-import com.balancedebate.api.web.dto.account.VoteRequest
-import com.balancedebate.api.web.dto.account.VoteResultResponse
+import com.balancedebate.api.web.dto.comment.CommentCreateRequest
+import com.balancedebate.api.web.dto.debate.HasVoteResponse
+import com.balancedebate.api.web.dto.debate.VoteRequest
+import com.balancedebate.api.web.dto.debate.VoteResultResponse
 import com.balancedebate.api.web.dto.debate.DebateGetResponse
 import com.balancedebate.api.web.dto.debate.DebateSliceResponse
 import com.balancedebate.api.web.exception.ApiException
 import com.balancedebate.api.web.exception.ErrorReason
-import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpSession
@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
+@Transactional
 @Service
 class DebateService(
     private val debateRepository: DebateRepository,
@@ -48,7 +49,6 @@ class DebateService(
             .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $id not found", "NOT_FOUND_DEBATE") }
     }
 
-    @Transactional
     fun voteOnDebate(debateId: Long, request: VoteRequest, httpServletRequest: HttpServletRequest, httpServletResponse: HttpServletResponse) {
         val loginUser = httpSession.getAttribute(LoginAccountArgumentResolver.LOGIN_ATTRIBUTE_NAME)
         val voteTokenCookie = httpServletRequest.cookies?.firstOrNull { VOTE_TOKEN_COOKIE_NAME == it.name }?.value
@@ -138,15 +138,31 @@ class DebateService(
         val debate = debateRepository.findById(debateId)
             .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
 
-        val hasVote = hasVote(debateId, httpServletRequest)
-        if (!hasVote.hasVote) {
-            throw ApiException(ErrorReason.FORBIDDEN, "You have not voted for this debate", "NOT_VOTED")
-        }
+        validateHasVote(debateId, httpServletRequest)
 
         val votes = debate.votes
         val choiceACount = votes.count { it.target == VoteTarget.CHOICE_A }
         val choiceBCount = votes.count { it.target == VoteTarget.CHOICE_B }
 
         return VoteResultResponse(choiceACount, choiceBCount)
+    }
+
+    private fun validateHasVote(debateId: Long, httpServletRequest: HttpServletRequest) {
+        val hasVote = hasVote(debateId, httpServletRequest)
+        if (!hasVote.hasVote) {
+            throw ApiException(ErrorReason.FORBIDDEN, "You have not voted for this debate", "NOT_VOTED")
+        }
+    }
+
+    fun createComment(account: Account, debateId: Long, request: CommentCreateRequest, httpServletRequest: HttpServletRequest) {
+        val debate = debateRepository.findById(debateId)
+            .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
+
+        val loginUser = accountRepository.findByNickname(account.nickname)
+            .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Account with nickname ${account.nickname} not found", "NOT_FOUND_ACCOUNT") }
+
+        validateHasVote(debateId, httpServletRequest)
+
+        debate.addComment(loginUser.id!!, request.content)
     }
 }
