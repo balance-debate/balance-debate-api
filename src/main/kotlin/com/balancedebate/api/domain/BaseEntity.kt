@@ -8,17 +8,18 @@ import java.time.LocalDateTime
 
 @EntityListeners(AuditingEntityListener::class)
 @MappedSuperclass
-open class BaseEntity(
+abstract class BaseEntity(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
+) {
 
     @CreatedDate
     @Column(updatable = false)
-    var createdAt: LocalDateTime? = null,
+    lateinit var createdAt: LocalDateTime
 
     @LastModifiedDate
     @Column
-    var updatedAt: LocalDateTime? = null,
-)
+    lateinit var updatedAt: LocalDateTime
+}
