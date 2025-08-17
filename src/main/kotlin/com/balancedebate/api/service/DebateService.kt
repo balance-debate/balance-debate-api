@@ -21,6 +21,8 @@ class DebateService(
     private val debateRepository: DebateRepository,
     private val voteRepository: VoteRepository,
     private val commentRepository: CommentRepository,
+    private val commentMetaRepository: CommentMetaRepository,
+    private val commentLikeRepository: CommentLikeRepository,
     private val httpSession: HttpSession,
     private val accountRepository: AccountRepository,
 ) {
@@ -179,8 +181,44 @@ class DebateService(
         val comments = sliceComments.content
         val parentCommentIds = comments.map { it.id!! }
         val childComments = commentRepository.findByParentCommentIdIn(parentCommentIds)
+        val account = httpSession.getAttribute(LoginAccountArgumentResolver.LOGIN_ATTRIBUTE_NAME)?.let {
+            accountRepository.findByNickname((it as Account).nickname).orElse(null)
+        }
+
+        commentMetaRepository.findByCommentIn(childComments).forEach { commentMeta ->
+            val childComment = childComments.find { it.id == commentMeta.comment.id }
+            childComment?.let {
+                it.likeCount = commentMeta.likeCount
+            }
+        }
+
+        if (account != null) {
+            commentLikeRepository.findByCommentInAndAccountId(childComments, account.id!!).forEach { commentLike ->
+                val childComment = childComments.find { it.id == commentLike.comment.id }
+                childComment?.let {
+                    it.liked = true
+                }
+            }
+        }
+
         comments.forEach { comment ->
             comment.childComments = childComments.filter { it.parentCommentId == comment.id }
+        }
+
+        commentMetaRepository.findByCommentIn(comments).forEach { commentMeta ->
+            val comment = comments.find { it.id == commentMeta.comment.id }
+            comment?.let {
+                it.likeCount = commentMeta.likeCount
+            }
+        }
+
+        if (account != null) {
+            commentLikeRepository.findByCommentInAndAccountId(comments, account.id!!).forEach { commentLike ->
+                val comment = comments.find { it.id == commentLike.comment.id }
+                comment?.let {
+                    it.liked = true
+                }
+            }
         }
 
         return CommentSliceResponse(hasNext = sliceComments.hasNext(), comments = CommentGetResponse.from(comments))

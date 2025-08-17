@@ -26,6 +26,12 @@ class Comment(
     @Transient
     lateinit var childComments: List<Comment>
 
+    @Transient
+    var likeCount: Long = 0
+
+    @Transient
+    var liked: Boolean = false
+
     companion object {
         private const val MAX_CONTENT_LENGTH = 500
     }
@@ -40,5 +46,5 @@ class Comment(
         }
     }
 
-    protected constructor() : this(Debate(), 1L, "댓글")
+    constructor() : this(Debate(), 1L, "댓글")
 }
