@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 class CommentLikeService(
     private val commentLikeRepository: CommentLikeRepository,
     private val commentRepository: CommentRepository,
+    private val commentMetaRepository: CommentMetaRepository,
     private val accountRepository: AccountRepository,
 ) {
 
@@ -28,5 +29,11 @@ class CommentLikeService(
         }
 
         commentLikeRepository.save(commentLike)
+
+        commentMetaRepository.findByComment(comment)
+            .ifPresentOrElse(
+                { it.likeCount += 1 },
+                { commentMetaRepository.save(CommentMeta(comment, 1)) }
+            )
     }
 }
