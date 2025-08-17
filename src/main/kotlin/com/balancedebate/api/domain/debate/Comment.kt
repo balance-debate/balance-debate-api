@@ -40,5 +40,5 @@ class Comment(
         }
     }
 
-    protected constructor() : this(Debate(), 1L, "댓글")
+    constructor() : this(Debate(), 1L, "댓글")
 }
