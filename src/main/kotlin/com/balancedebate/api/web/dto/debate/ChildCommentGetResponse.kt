@@ -6,6 +6,8 @@ import java.time.LocalDateTime
 data class ChildCommentGetResponse(
     val id: Long,
     val content: String,
+    val likeCount: Long,
+    val liked: Boolean,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
@@ -18,6 +20,8 @@ data class ChildCommentGetResponse(
             return ChildCommentGetResponse(
                 id = comment.id!!,
                 content = comment.content,
+                likeCount = comment.likeCount,
+                liked = comment.liked,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt,
             )

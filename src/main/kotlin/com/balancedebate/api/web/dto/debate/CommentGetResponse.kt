@@ -8,6 +8,7 @@ data class CommentGetResponse(
     val content: String,
     val childComments: List<ChildCommentGetResponse> = emptyList(),
     val likeCount: Long,
+    val liked: Boolean,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
@@ -22,6 +23,7 @@ data class CommentGetResponse(
                 content = comment.content,
                 childComments = ChildCommentGetResponse.from(comment.childComments),
                 likeCount = comment.likeCount,
+                liked = comment.liked,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt,
             )

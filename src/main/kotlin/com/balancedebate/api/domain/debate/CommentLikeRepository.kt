@@ -8,4 +8,6 @@ interface CommentLikeRepository : JpaRepository<CommentLike, Long> {
     fun existsByCommentAndAccountId(comment: Comment, accountId: Long): Boolean
 
     fun findByCommentAndAccountId(comment: Comment, accountId: Long): Optional<CommentLike>
+
+    fun findByCommentInAndAccountId(comments: List<Comment>, accountId: Long): List<CommentLike>
 }

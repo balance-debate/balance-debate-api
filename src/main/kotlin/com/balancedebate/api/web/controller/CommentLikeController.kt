@@ -7,10 +7,6 @@ import com.balancedebate.api.web.dto.ApiResponse
 import com.balancedebate.api.web.dto.debate.*
 import org.springframework.web.bind.annotation.*
 
-/**
- * 3. 댓글 응답 목록에 좋아요 개수 추가(commentMeta 테이블 생성)
- * 4. 댓글 응답 목록에 내가 좋아요 했는지 여부 추가
- */
 @RestController
 class CommentLikeController(
     private val commentLikeService: CommentLikeService

@@ -29,6 +29,9 @@ class Comment(
     @Transient
     var likeCount: Long = 0
 
+    @Transient
+    var liked: Boolean = false
+
     companion object {
         private const val MAX_CONTENT_LENGTH = 500
     }
