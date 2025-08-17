@@ -17,7 +17,7 @@ class CommentLikeService(
     private val accountRepository: AccountRepository,
 ) {
 
-    fun likeComment(commentId: Long, account: Account) {
+    fun createCommentLike(commentId: Long, account: Account) {
         val comment = commentRepository.findById(commentId).orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Comment with id $commentId not found", "NOT_FOUND_COMMENT") }
 
         val loginUser = accountRepository.findByNickname(account.nickname)
@@ -35,5 +35,25 @@ class CommentLikeService(
                 { it.likeCount += 1 },
                 { commentMetaRepository.save(CommentMeta(comment, 1)) }
             )
+    }
+
+    fun deleteCommentLike(commentId: Long, account: Account) {
+        val comment = commentRepository.findById(commentId).orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Comment with id $commentId not found", "NOT_FOUND_COMMENT") }
+
+        val loginUser = accountRepository.findByNickname(account.nickname)
+            .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Account with nickname ${account.nickname} not found", "NOT_FOUND_ACCOUNT") }
+
+        commentLikeRepository.findByCommentAndAccountId(comment, loginUser.id!!)
+            .ifPresent {
+                commentLikeRepository.delete(it)
+
+                commentMetaRepository.findByComment(comment)
+                    .ifPresent { commentMeta ->
+                        if (commentMeta.likeCount > 0) {
+                            commentMeta.likeCount -= 1
+                            commentMetaRepository.save(commentMeta)
+                        }
+                    }
+            }
     }
 }
