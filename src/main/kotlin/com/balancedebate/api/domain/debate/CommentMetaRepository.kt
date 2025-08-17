@@ -6,4 +6,6 @@ import java.util.Optional
 interface CommentMetaRepository : JpaRepository<CommentMeta, Long> {
 
     fun findByComment(comment: Comment): Optional<CommentMeta>
+
+    fun findByCommentIn(comments: List<Comment>): List<CommentMeta>
 }

@@ -21,6 +21,7 @@ class DebateService(
     private val debateRepository: DebateRepository,
     private val voteRepository: VoteRepository,
     private val commentRepository: CommentRepository,
+    private val commentMetaRepository: CommentMetaRepository,
     private val httpSession: HttpSession,
     private val accountRepository: AccountRepository,
 ) {
@@ -181,6 +182,13 @@ class DebateService(
         val childComments = commentRepository.findByParentCommentIdIn(parentCommentIds)
         comments.forEach { comment ->
             comment.childComments = childComments.filter { it.parentCommentId == comment.id }
+        }
+
+        commentMetaRepository.findByCommentIn(comments).forEach { commentMeta ->
+            val comment = comments.find { it.id == commentMeta.comment.id }
+            comment?.let {
+                it.likeCount = commentMeta.likeCount
+            }
         }
 
         return CommentSliceResponse(hasNext = sliceComments.hasNext(), comments = CommentGetResponse.from(comments))

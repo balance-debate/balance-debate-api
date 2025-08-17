@@ -26,6 +26,9 @@ class Comment(
     @Transient
     lateinit var childComments: List<Comment>
 
+    @Transient
+    var likeCount: Long = 0
+
     companion object {
         private const val MAX_CONTENT_LENGTH = 500
     }
