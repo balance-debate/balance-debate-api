@@ -224,6 +224,16 @@ class DebateService(
             }
         }
 
+        val accountIds = comments.map { it.accountId!! }
+        val accounts = accountRepository.findByIdIn(accountIds).associateBy { it.id!! }
+        comments.forEach { comment ->
+            val commentAccount = accounts[comment.accountId]
+            commentAccount?.let {
+                comment.nickname = it.nickname
+                comment.profileEmoji = it.profileEmoji
+            }
+        }
+
         return CommentSliceResponse(hasNext = sliceComments.hasNext(), comments = CommentGetResponse.from(comments))
     }
 }
