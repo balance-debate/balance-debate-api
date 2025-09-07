@@ -224,13 +224,23 @@ class DebateService(
             }
         }
 
-        val accountIds = comments.map { it.accountId!! }
-        val accounts = accountRepository.findByIdIn(accountIds).associateBy { it.id!! }
+        val commentWriters = comments.map { it.accountId!! }
+        val childCommentWriters = comments.flatMap { comment -> comment.childComments.map { childComment -> childComment.accountId!! } }
+
+        val writers = accountRepository.findByIdIn(commentWriters.plus(childCommentWriters)).associateBy { it.id!! }
         comments.forEach { comment ->
-            val commentAccount = accounts[comment.accountId]
+            val commentAccount = writers[comment.accountId]
             commentAccount?.let {
                 comment.nickname = it.nickname
                 comment.profileEmoji = it.profileEmoji
+            }
+        }
+
+        childComments.forEach { childComment ->
+            val childCommentAccount = writers[childComment.accountId]
+            childCommentAccount?.let {
+                childComment.nickname = it.nickname
+                childComment.profileEmoji = it.profileEmoji
             }
         }
 
