@@ -1,6 +1,7 @@
 package com.balancedebate.api.web.dto.debate
 
 import com.balancedebate.api.domain.debate.Comment
+import com.balancedebate.api.web.dto.account.AccountResponse
 import java.time.LocalDateTime
 
 data class CommentGetResponse(
@@ -11,6 +12,7 @@ data class CommentGetResponse(
     val liked: Boolean,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
+    val writer: AccountResponse,
 ) {
     companion object {
         fun from(comments: List<Comment>): List<CommentGetResponse> {
@@ -26,6 +28,10 @@ data class CommentGetResponse(
                 liked = comment.liked,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt,
+                writer = AccountResponse(
+                    nickname = comment.nickname,
+                    profileEmoji = comment.profileEmoji,
+                ),
             )
         }
     }

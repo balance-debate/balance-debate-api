@@ -32,6 +32,12 @@ class Comment(
     @Transient
     var liked: Boolean = false
 
+    @Transient
+    lateinit var nickname: String
+
+    @Transient
+    lateinit var profileEmoji: String
+
     companion object {
         private const val MAX_CONTENT_LENGTH = 500
     }
