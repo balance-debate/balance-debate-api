@@ -6,4 +6,6 @@ import java.util.*
 interface AccountRepository : JpaRepository<Account, Long> {
 
     fun findByNickname(nickname: String): Optional<Account>
+
+    fun findByIdIn(accountIds: List<Long>): List<Account>
 }
