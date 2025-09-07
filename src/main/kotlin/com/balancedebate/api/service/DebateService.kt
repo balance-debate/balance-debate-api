@@ -149,7 +149,7 @@ class DebateService(
         }
     }
 
-    fun createComment(account: Account, debateId: Long, request: CommentCreateRequest, httpServletRequest: HttpServletRequest) {
+    fun createComment(account: Account, debateId: Long, request: CommentCreateRequest, httpServletRequest: HttpServletRequest): CommentCreateResponse {
         val debate = debateRepository.findById(debateId)
             .orElseThrow { ApiException(ErrorReason.NOT_FOUND_ENTITY, "Debate with id $debateId not found", "NOT_FOUND_DEBATE") }
 
@@ -167,7 +167,10 @@ class DebateService(
             }
         }
 
-        debate.addComment(loginUser.id!!, request.content, request.parentCommentId)
+        val comment = debate.addComment(loginUser.id!!, request.content, request.parentCommentId)
+        commentRepository.save(comment)
+
+        return CommentCreateResponse(comment.id!!)
     }
 
     @Transactional(readOnly = true)

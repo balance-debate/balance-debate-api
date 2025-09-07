@@ -44,9 +44,9 @@ class DebateController(
 
     @PostMapping("/debates/{debateId}/comments")
     fun createComment(@LoginAccount account: Account, @PathVariable debateId: Long, @RequestBody request: CommentCreateRequest,
-                      httpServletRequest: HttpServletRequest): ApiResponse<Unit> {
-        debateService.createComment(account, debateId, request, httpServletRequest)
-        return ApiResponse.success()
+                      httpServletRequest: HttpServletRequest): ApiResponse<CommentCreateResponse> {
+        val response = debateService.createComment(account, debateId, request, httpServletRequest)
+        return ApiResponse.success(response)
     }
 
     @GetMapping("/debates/{debateId}/comments")
