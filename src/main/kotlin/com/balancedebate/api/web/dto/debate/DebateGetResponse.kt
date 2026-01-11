@@ -4,6 +4,7 @@ import com.balancedebate.api.domain.debate.Debate
 import java.time.LocalDateTime
 
 data class DebateGetResponse(
+    val id: Long,
     val topic: String,
     val choiceA: String,
     val choiceB: String,
@@ -18,6 +19,7 @@ data class DebateGetResponse(
 
         fun from(debate: Debate): DebateGetResponse {
             return DebateGetResponse(
+                id = debate.id!!,
                 topic = debate.topic,
                 choiceA = debate.choiceA,
                 choiceB = debate.choiceB,
